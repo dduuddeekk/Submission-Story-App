@@ -13,7 +13,6 @@
         android:layout_height="200dp"
         android:contentDescription="@string/cover"
         android:src="@drawable/ic_insert_photo_24"
-        app:tint="?attr/colorPrimary"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>

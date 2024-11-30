@@ -11,7 +11,7 @@
     <Button
         android:id="@+id/bt_log_in"
         android:layout_width="150dp"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:text="@string/log_in"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -22,12 +22,24 @@
     <Button
         android:id="@+id/bt_register"
         android:layout_width="150dp"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:text="@string/register"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toEndOf="@id/bt_log_in"
         app:layout_constraintEnd_toEndOf="parent"
         android:textColor="?attr/colorSecondary"
         android:background="@drawable/button_background"/>
+
+    <TextView
+        android:id="@+id/tv_guest"
+        android:layout_marginTop="16dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/bt_log_in"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:textAlignment="center"
+        android:textColor="?attr/colorPrimary"
+        android:text="@string/continue_as_guest"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
