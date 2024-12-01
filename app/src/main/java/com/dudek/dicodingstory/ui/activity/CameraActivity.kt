@@ -28,11 +28,12 @@ class CameraActivity : AppCompatActivity() {
     private var camera: Camera? = null
     private var isBackCamera = true
     private var imageCapture: ImageCapture? = null
+    private var token: String? = null
 
     private val selectImageLauncher =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
             uri?.let {
-                sendImageToNewStoryActivity(it)
+                sendImageToNewStoryActivity(it, token)
             }
         }
 
@@ -40,6 +41,8 @@ class CameraActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityCameraBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        token = intent.getStringExtra(EXTRA_TOKEN)
 
         if (hasPermissions()) {
             initializeFeatures()
@@ -155,7 +158,7 @@ class CameraActivity : AppCompatActivity() {
             object : ImageCapture.OnImageSavedCallback {
                 override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
                     val savedUri = Uri.fromFile(outputFile)
-                    sendImageToNewStoryActivity(savedUri)
+                    sendImageToNewStoryActivity(savedUri, token)
                 }
 
                 override fun onError(exception: ImageCaptureException) {
@@ -185,9 +188,16 @@ class CameraActivity : AppCompatActivity() {
         }
     }
 
-    private fun sendImageToNewStoryActivity(imageUri: Uri) {
-        val intent = Intent(this, NewStoryActivity::class.java)
-        intent.putExtra("image_uri", imageUri.toString())
+    private fun sendImageToNewStoryActivity(imageUri: Uri, token: String?) {
+        val intent = Intent(this, NewStoryActivity::class.java).apply {
+            putExtra("image_uri", imageUri.toString()) // Mengirimkan URI gambar sebagai string
+            putExtra(EXTRA_TOKEN, token)
+        }
         startActivity(intent)
+        finish()
+    }
+
+    companion object {
+        const val EXTRA_TOKEN = "EXTRA_TOKEN"
     }
 }
