@@ -9,7 +9,6 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
 import com.dudek.dicodingstory.data.api.ApiConfig
 import com.dudek.dicodingstory.data.response.StoryUploadResponse
@@ -47,13 +46,13 @@ class NewStoryActivity : AppCompatActivity() {
         viewModel.setToken(token)
         viewModel.setImageUri(imageUri)
 
-        viewModel.imageUri.observe(this, Observer { uri ->
+        viewModel.imageUri.observe(this) { uri ->
             if (uri != null) {
                 Glide.with(this)
                     .load(uri)
                     .into(binding.ivCover)
             }
-        })
+        }
 
         binding.apply {
             ibCamera.setOnClickListener {
