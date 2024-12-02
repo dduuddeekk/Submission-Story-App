@@ -30,17 +30,17 @@ class RegisterActivity : AppCompatActivity() {
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        accountViewModel.name.observe(this, Observer { name ->
+        accountViewModel.name.observe(this) { name ->
             binding.etName.setText(name)
-        })
+        }
 
-        accountViewModel.email.observe(this, Observer { email ->
+        accountViewModel.email.observe(this) { email ->
             binding.etEmail.setText(email)
-        })
+        }
 
-        accountViewModel.password.observe(this, Observer { password ->
+        accountViewModel.password.observe(this) { password ->
             binding.etPassword.setText(password)
-        })
+        }
 
         binding.etPassword.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_UP) {

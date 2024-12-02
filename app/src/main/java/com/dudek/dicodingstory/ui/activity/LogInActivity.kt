@@ -7,7 +7,6 @@ import android.view.MotionEvent
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
 import com.dudek.dicodingstory.R
 import com.dudek.dicodingstory.data.api.ApiConfig
 import com.dudek.dicodingstory.data.response.LogInResponse
@@ -30,13 +29,13 @@ class LogInActivity : AppCompatActivity() {
         binding = ActivityLogInBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        accountViewModel.email.observe(this, Observer { email ->
+        accountViewModel.email.observe(this) { email ->
             binding.etEmail.setText(email)
-        })
+        }
 
-        accountViewModel.password.observe(this, Observer { password ->
+        accountViewModel.password.observe(this) { password ->
             binding.etPassword.setText(password)
-        })
+        }
 
         binding.etPassword.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_UP) {
