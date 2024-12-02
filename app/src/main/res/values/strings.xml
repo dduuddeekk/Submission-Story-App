@@ -17,4 +17,9 @@
     <string name="password">Password</string>
     <string name="name">Name</string>
     <string name="continue_as_guest">Continue as guest.</string>
+    <string name="welcome_image">Welcome image.</string>
+    <string name="welcome_in_dicoding">Welcome in Dicoding!</string>
+    <string name="message_welcome_page">Want to learn Android, iOS, Machine Learning, Cloud, Front-End, Back-End, and other IT fields? Learn at Dicoding!</string>
+    <string name="login_image">Login image</string>
+    <string name="register_image">Register image.</string>
 </resources>

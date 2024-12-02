@@ -1,21 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">DicodingStory</string>
-    <string name="add_story_button">Botón Agregar Historia</string>
-    <string name="switch_camera_button">Botón Cambiar Cámara</string>
-    <string name="gallery_button">Botón Galería</string>
+    <string name="add_story_button">Botón de añadir historia</string>
+    <string name="switch_camera_button">Botón para cambiar cámara</string>
+    <string name="gallery_button">Botón de galería</string>
     <string name="cover">Portada</string>
-    <string name="camera_button">Botón Cámara</string>
-    <string name="your_story">Tu historia ....</string>
+    <string name="camera_button">Botón de cámara</string>
+    <string name="your_story">Tu historia....</string>
     <string name="upload">Subir</string>
     <string name="story">Historia</string>
-    <string name="story_title">Título de la Historia</string>
+    <string name="story_title">Título de la historia</string>
     <string name="dummy_text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent ut porta velit. Vivamus sodales, dolor quis tristique sollicitudin, risus metus imperdiet nisi, nec bibendum neque nisl non dui. Mauris et magna id tortor venenatis vehicula. Vestibulum interdum turpis eget dui consequat, eget sodales enim consequat. Curabitur gravida quam sed enim efficitur, sit amet interdum eros tristique. Quisque sit amet lacus non ipsum ultricies scelerisque. Pellentesque at ultricies tortor. Suspendisse posuere quam nunc, id volutpat nisi euismod sit amet. Donec quam nisl, dignissim sit amet neque ac, pellentesque convallis dui. Nulla sagittis enim eu diam laoreet, sed lobortis ipsum varius.</string>
-    <string name="dicoding_stories">Historias de Dicoding ....</string>
+    <string name="dicoding_stories">Historias de Dicoding....</string>
     <string name="log_in">Iniciar sesión</string>
     <string name="register">Registrarse</string>
     <string name="e_mail">Correo electrónico</string>
     <string name="password">Contraseña</string>
     <string name="name">Nombre</string>
     <string name="continue_as_guest">Continuar como invitado.</string>
+    <string name="welcome_image">Imagen de bienvenida</string>
+    <string name="welcome_in_dicoding">¡Bienvenido a Dicoding!</string>
+    <string name="message_welcome_page">¿Quieres aprender Android, iOS, Machine Learning, Cloud, Front-End, Back-End y otros campos de TI? ¡Aprende en Dicoding!</string>
+    <string name="login_image">Imagen de inicio de sesión</string>
+    <string name="register_image">Imagen de registro.</string>
 </resources>

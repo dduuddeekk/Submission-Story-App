@@ -1,21 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">DicodingStory</string>
-    <string name="add_story_button">Tombol Tambah Cerita</string>
-    <string name="switch_camera_button">Tombol Ganti Kamera</string>
-    <string name="gallery_button">Tombol Galeri</string>
+    <string name="add_story_button">Tombol tambah crita</string>
+    <string name="switch_camera_button">Tombol ganti kamera.</string>
+    <string name="gallery_button">Tombol galeri.</string>
     <string name="cover">Sampul</string>
-    <string name="camera_button">Tombol Kamera</string>
-    <string name="your_story">Cerita Panjenengan ....</string>
+    <string name="camera_button">Tombol kamera.</string>
+    <string name="your_story">Critamu ....</string>
     <string name="upload">Unggah</string>
-    <string name="story">Cerita</string>
-    <string name="story_title">Judul Cerita</string>
+    <string name="story">Crita</string>
+    <string name="story_title">Judhul Crita</string>
     <string name="dummy_text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent ut porta velit. Vivamus sodales, dolor quis tristique sollicitudin, risus metus imperdiet nisi, nec bibendum neque nisl non dui. Mauris et magna id tortor venenatis vehicula. Vestibulum interdum turpis eget dui consequat, eget sodales enim consequat. Curabitur gravida quam sed enim efficitur, sit amet interdum eros tristique. Quisque sit amet lacus non ipsum ultricies scelerisque. Pellentesque at ultricies tortor. Suspendisse posuere quam nunc, id volutpat nisi euismod sit amet. Donec quam nisl, dignissim sit amet neque ac, pellentesque convallis dui. Nulla sagittis enim eu diam laoreet, sed lobortis ipsum varius.</string>
-    <string name="dicoding_stories">Cerita-cerita Dicoding ....</string>
+    <string name="dicoding_stories">Crita-critane saka Dicoding ....</string>
     <string name="log_in">Mlebu</string>
     <string name="register">Daftar</string>
     <string name="e_mail">E-mail</string>
-    <string name="password">Sandi</string>
-    <string name="name">Nama</string>
-    <string name="continue_as_guest">Lanjutake minangka tamu.</string>
+    <string name="password">Tembung Sandi</string>
+    <string name="name">Jeneng</string>
+    <string name="continue_as_guest">Terusake dadi tamu.</string>
+    <string name="welcome_image">Gambar sugeng rawuh.</string>
+    <string name="welcome_in_dicoding">Sugeng rawuh ing Dicoding!</string>
+    <string name="message_welcome_page">Pengin sinau Android, iOS, Machine Learning, Cloud, Front-End, Back-End, lan babagan TI liyane? Sinau ing Dicoding!</string>
+    <string name="login_image">Gambar mlebu</string>
+    <string name="register_image">Gambar daftar.</string>
 </resources>

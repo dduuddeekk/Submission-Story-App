@@ -1,9 +1,12 @@
 package com.dudek.dicodingstory.ui.activity
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.MotionEvent
+import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -28,6 +31,8 @@ class RegisterActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        playAnimation()
 
         accountViewModel.name.observe(this) { name ->
             binding.etName.setText(name)
@@ -160,5 +165,27 @@ class RegisterActivity : AppCompatActivity() {
                 ).show()
             }
         })
+    }
+
+    private fun playAnimation() {
+        ObjectAnimator.ofFloat(binding.ivRegisterCover, View.TRANSLATION_X, -30f, 30f).apply {
+            duration = 6000
+            repeatCount = ObjectAnimator.INFINITE
+            repeatMode = ObjectAnimator.REVERSE
+        }.start()
+
+        val name = ObjectAnimator.ofFloat(binding.etName, View.ALPHA, 1f).setDuration(2000)
+        val email = ObjectAnimator.ofFloat(binding.etEmail, View.ALPHA, 1f).setDuration(2000)
+        val password = ObjectAnimator.ofFloat(binding.etPassword, View.ALPHA, 1f).setDuration(2000)
+        val login = ObjectAnimator.ofFloat(binding.btRegister, View.ALPHA, 1f).setDuration(2000)
+
+        val together = AnimatorSet().apply {
+            playTogether(name, email, password)
+        }
+
+        AnimatorSet().apply {
+            playSequentially(login, together)
+            start()
+        }
     }
 }

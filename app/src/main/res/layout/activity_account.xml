@@ -8,26 +8,59 @@
     android:padding="16dp"
     tools:context=".ui.activity.AccountActivity">
 
+    <ImageView
+        android:id="@+id/iv_cover_image"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:contentDescription="@string/welcome_image"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/image_welcome" />
+
+    <TextView
+        android:id="@+id/tv_welcome"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/welcome_in_dicoding"
+        app:layout_constraintTop_toBottomOf="@id/iv_cover_image"
+        app:layout_constraintStart_toStartOf="parent"
+        android:textStyle="bold"
+        android:textColor="?attr/colorPrimary"
+        android:textSize="25sp"/>
+
+    <TextView
+        android:id="@+id/tv_description_welcome"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/message_welcome_page"
+        app:layout_constraintTop_toBottomOf="@id/tv_welcome"
+        app:layout_constraintStart_toStartOf="parent"
+        android:textColor="?attr/colorPrimary"
+        android:textSize="15sp"/>
+
     <Button
         android:id="@+id/bt_log_in"
         android:layout_width="150dp"
         android:layout_height="50dp"
         android:text="@string/log_in"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_description_welcome"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/bt_register"
         android:textColor="?attr/colorSecondary"
-        android:background="@drawable/button_background"/>
+        android:background="@drawable/button_background"
+        android:layout_marginTop="16dp"/>
 
     <Button
         android:id="@+id/bt_register"
         android:layout_width="150dp"
         android:layout_height="50dp"
         android:text="@string/register"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_description_welcome"
         app:layout_constraintStart_toEndOf="@id/bt_log_in"
         app:layout_constraintEnd_toEndOf="parent"
         android:textColor="?attr/colorSecondary"
-        android:background="@drawable/button_background"/>
+        android:background="@drawable/button_background"
+        android:layout_marginTop="16dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
