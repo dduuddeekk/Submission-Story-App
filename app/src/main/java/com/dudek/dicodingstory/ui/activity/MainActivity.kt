@@ -47,7 +47,7 @@ class MainActivity : AppCompatActivity() {
             override fun onResponse(call: Call<StoriesResponse>, response: Response<StoriesResponse>) {
                 if (response.isSuccessful) {
                     val stories = response.body()?.listStory ?: emptyList()
-                    binding.rvStoryContainer.adapter = StoriesAdapter(stories)
+                    binding.rvStoryContainer.adapter = StoriesAdapter(stories, token)
                 } else {
                     Toast.makeText(this@MainActivity, "Failed to load stories", Toast.LENGTH_SHORT).show()
                 }

@@ -40,7 +40,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:drawableStart="@drawable/ic_email_24"
         android:drawableTint="?attr/colorAccent"
-        android:drawablePadding="10dp"/>
+        android:drawablePadding="10dp" />
 
     <EditText
         android:id="@+id/et_password"
@@ -57,7 +57,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:drawableStart="@drawable/ic_lock_24"
         android:drawableTint="?attr/colorAccent"
-        android:drawablePadding="10dp"/>
+        android:drawablePadding="10dp"
+        android:drawableEnd="@drawable/ic_visibility_24"/>
 
     <Button
         android:id="@+id/bt_register"
