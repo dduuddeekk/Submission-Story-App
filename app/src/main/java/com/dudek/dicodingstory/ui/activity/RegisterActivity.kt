@@ -7,7 +7,6 @@ import android.view.MotionEvent
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
 import com.dudek.dicodingstory.R
 import com.dudek.dicodingstory.data.api.ApiConfig
 import com.dudek.dicodingstory.data.response.RegisterResponse
