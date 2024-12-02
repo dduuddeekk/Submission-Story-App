@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">DicodingStory</string>
+    <string name="app_name">Dicoding Story</string>
     <string name="add_story_button">Tombol tambah crita</string>
     <string name="switch_camera_button">Tombol ganti kamera.</string>
     <string name="gallery_button">Tombol galeri.</string>
@@ -23,4 +23,5 @@
     <string name="message_welcome_page">Pengin sinau Android, iOS, Machine Learning, Cloud, Front-End, Back-End, lan babagan TI liyane? Sinau ing Dicoding!</string>
     <string name="login_image">Gambar mlebu</string>
     <string name="register_image">Gambar daftar.</string>
+    <string name="log_out">Metu</string>
 </resources>
