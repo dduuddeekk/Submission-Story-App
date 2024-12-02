@@ -12,9 +12,14 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.dudek.dicodingstory.R
 import com.dudek.dicodingstory.data.api.ApiConfig
+import com.dudek.dicodingstory.data.pref.SessionPreference
 import com.dudek.dicodingstory.data.response.LogInResponse
 import com.dudek.dicodingstory.databinding.ActivityLogInBinding
 import com.dudek.dicodingstory.ui.model.AccountViewModel
+import com.dudek.myservice.TokenBackgroundService
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -116,6 +121,11 @@ class LogInActivity : AppCompatActivity() {
                         val name = loginResponse.loginResult?.name
                         val token = loginResponse.loginResult?.token
 
+                        if (token != null) {
+                            saveTokenToSession(token) // Simpan token ke SessionPreference
+                            startTokenService() // Mulai TokenBackgroundService
+                        }
+
                         val intent = Intent(this@LogInActivity, MainActivity::class.java).apply {
                             putExtra("EXTRA_NAME", name)
                             putExtra("EXTRA_TOKEN", token)
@@ -146,6 +156,18 @@ class LogInActivity : AppCompatActivity() {
                 ).show()
             }
         })
+    }
+
+    private fun saveTokenToSession(token: String) {
+        val sessionPreference = SessionPreference(this)
+        CoroutineScope(Dispatchers.IO).launch {
+            sessionPreference.saveToken(token)
+        }
+    }
+
+    private fun startTokenService() {
+        val intent = Intent(this, TokenBackgroundService::class.java)
+        startService(intent)
     }
 
     private fun playAnimation() {
