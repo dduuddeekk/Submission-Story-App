@@ -1,14 +1,20 @@
 package com.dudek.dicodingstory.ui.activity
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.database.Cursor
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.OpenableColumns
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.dudek.dicodingstory.data.api.ApiConfig
 import com.dudek.dicodingstory.data.response.StoryUploadResponse
@@ -29,10 +35,20 @@ class NewStoryActivity : AppCompatActivity() {
     private lateinit var binding: ActivityNewStoryBinding
     private val viewModel: NewStoryViewModel by viewModels()
 
+    // Request permission launcher
+    private val requestPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+            if (!isGranted) {
+                Toast.makeText(this, "Permission denied to access media.", Toast.LENGTH_SHORT).show()
+            }
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityNewStoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        checkAndRequestPermissions()
 
         val token = intent.getStringExtra("EXTRA_TOKEN")
         val imageUri = intent.getStringExtra("image_uri")?.let { Uri.parse(it) }
@@ -77,7 +93,24 @@ class NewStoryActivity : AppCompatActivity() {
                     uploadStory(viewModel.token.value!!, description, file)
                 } else {
                     Toast.makeText(this@NewStoryActivity, "Invalid file!", Toast.LENGTH_SHORT).show()
+                    Log.d("NewStoryActivity", "Selected URI: ${viewModel.imageUri.value}")
                 }
+            }
+        }
+    }
+
+    private fun checkAndRequestPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissionLauncher.launch(Manifest.permission.READ_MEDIA_IMAGES)
+            }
+        } else {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                    101
+                )
             }
         }
     }
