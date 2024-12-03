@@ -13,7 +13,7 @@ import com.dudek.dicodingstory.ui.activity.StoryDetailActivity
 import androidx.core.util.Pair
 
 class StoriesAdapter(
-    private val stories: ArrayList<ListStoryItem>,
+    private val stories: List<ListStoryItem>,
     private val token: String?
 ) : RecyclerView.Adapter<StoriesAdapter.StoriesViewHolder>() {
 
