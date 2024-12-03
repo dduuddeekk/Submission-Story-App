@@ -31,7 +31,8 @@
             android:src="@drawable/ic_logout_24"
             android:contentDescription="@string/log_out"
             android:layout_gravity="end"
-            app:tint="?attr/colorPrimary"/>
+            app:tint="?attr/colorPrimary"
+            android:layout_marginEnd="16dp"/>
     </androidx.appcompat.widget.Toolbar>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -55,6 +56,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         style="@style/Widget.DicodingStory.FloatingActionButton"
-        android:layout_marginVertical="16dp"/>
+        android:layout_margin="16dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

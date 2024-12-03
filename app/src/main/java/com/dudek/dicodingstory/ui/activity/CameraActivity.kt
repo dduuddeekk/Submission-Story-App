@@ -3,6 +3,8 @@ package com.dudek.dicodingstory.ui.activity
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -10,16 +12,13 @@ import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.camera.core.Camera
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.ImageCapture
-import androidx.camera.core.ImageCaptureException
-import androidx.camera.core.Preview
+import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.dudek.dicodingstory.databinding.ActivityCameraBinding
+import java.io.ByteArrayOutputStream
 import java.io.File
 
 class CameraActivity : AppCompatActivity() {
@@ -33,7 +32,14 @@ class CameraActivity : AppCompatActivity() {
     private val selectImageLauncher =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
             uri?.let {
-                sendImageToNewStoryActivity(it, token)
+                val file = File(cacheDir, "gallery_image.jpg")
+                contentResolver.openInputStream(it)?.use { input ->
+                    file.outputStream().use { output ->
+                        input.copyTo(output)
+                    }
+                }
+                val compressedFile = compressImage(file)
+                sendImageToNewStoryActivity(Uri.fromFile(compressedFile), token)
             }
         }
 
@@ -157,7 +163,8 @@ class CameraActivity : AppCompatActivity() {
             ContextCompat.getMainExecutor(this),
             object : ImageCapture.OnImageSavedCallback {
                 override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                    val savedUri = Uri.fromFile(outputFile)
+                    val compressedFile = compressImage(outputFile)
+                    val savedUri = Uri.fromFile(compressedFile)
                     sendImageToNewStoryActivity(savedUri, token)
                 }
 
@@ -188,9 +195,25 @@ class CameraActivity : AppCompatActivity() {
         }
     }
 
+    private fun compressImage(file: File): File {
+        val bitmap = BitmapFactory.decodeFile(file.path)
+        var quality = 100
+        val outputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
+        while (outputStream.toByteArray().size > 1_000_000) {
+            outputStream.reset()
+            quality -= 5
+            bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
+        }
+        file.outputStream().use {
+            it.write(outputStream.toByteArray())
+        }
+        return file
+    }
+
     private fun sendImageToNewStoryActivity(imageUri: Uri, token: String?) {
         val intent = Intent(this, NewStoryActivity::class.java).apply {
-            putExtra("image_uri", imageUri.toString()) // Mengirimkan URI gambar sebagai string
+            putExtra("image_uri", imageUri.toString())
             putExtra(EXTRA_TOKEN, token)
         }
         startActivity(intent)
