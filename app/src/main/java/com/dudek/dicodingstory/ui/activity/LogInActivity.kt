@@ -16,7 +16,7 @@ import com.dudek.dicodingstory.data.pref.SessionPreference
 import com.dudek.dicodingstory.data.response.LogInResponse
 import com.dudek.dicodingstory.databinding.ActivityLogInBinding
 import com.dudek.dicodingstory.ui.model.AccountViewModel
-import com.dudek.myservice.TokenBackgroundService
+import com.dudek.dicodingstory.data.service.TokenBackgroundService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

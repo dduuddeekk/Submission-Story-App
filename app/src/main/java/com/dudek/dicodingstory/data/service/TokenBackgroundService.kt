@@ -1,4 +1,4 @@
-package com.dudek.myservice
+package com.dudek.dicodingstory.data.service
 
 import android.app.Service
 import android.content.Context

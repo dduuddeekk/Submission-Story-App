@@ -5,7 +5,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.dudek.dicodingstory.data.pref.SessionPreference
 import com.dudek.dicodingstory.databinding.ActivitySplashBinding
-import com.dudek.myservice.TokenBackgroundService
+import com.dudek.dicodingstory.data.service.TokenBackgroundService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
