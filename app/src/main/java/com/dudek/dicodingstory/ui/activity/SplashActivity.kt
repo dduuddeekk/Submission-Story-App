@@ -1,23 +1,24 @@
 package com.dudek.dicodingstory.ui.activity
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
+import com.dudek.dicodingstory.R
 import com.dudek.dicodingstory.data.pref.SessionPreference
-import com.dudek.dicodingstory.databinding.ActivitySplashBinding
 import com.dudek.dicodingstory.data.service.TokenBackgroundService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+@SuppressLint("CustomSplashScreen")
 class SplashActivity : AppCompatActivity() {
-
-    private lateinit var binding: ActivitySplashBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivitySplashBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        setContentView(R.layout.activity_splash)
 
         checkTokenAndNavigate()
     }
@@ -27,13 +28,15 @@ class SplashActivity : AppCompatActivity() {
 
         CoroutineScope(Dispatchers.Main).launch {
             sessionPreference.token.collect { token ->
-                if (token.isNullOrEmpty()) {
-                    stopService(Intent(this@SplashActivity, TokenBackgroundService::class.java))
-                    navigateToAccountActivity()
-                } else {
-                    TokenBackgroundService.startService(this@SplashActivity)
-                    navigateToMainActivity(token)
-                }
+                Handler(Looper.getMainLooper()).postDelayed({
+                    if (token.isNullOrEmpty()) {
+                        stopService(Intent(this@SplashActivity, TokenBackgroundService::class.java))
+                        navigateToAccountActivity()
+                    } else {
+                        TokenBackgroundService.startService(this@SplashActivity)
+                        navigateToMainActivity(token)
+                    }
+                }, 3000)
             }
         }
     }
@@ -46,13 +49,9 @@ class SplashActivity : AppCompatActivity() {
 
     private fun navigateToMainActivity(token: String) {
         val intent = Intent(this, MainActivity::class.java).apply {
-            putExtra(EXTRA_TOKEN, token)
+            putExtra(MainActivity.EXTRA_TOKEN, token)
         }
         startActivity(intent)
         finish()
-    }
-
-    companion object {
-        const val EXTRA_TOKEN = "EXTRA_TOKEN"
     }
 }
