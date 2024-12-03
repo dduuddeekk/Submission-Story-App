@@ -10,6 +10,7 @@ import com.bumptech.glide.Glide
 import com.dudek.dicodingstory.data.response.ListStoryItem
 import com.dudek.dicodingstory.databinding.StoryViewBinding
 import com.dudek.dicodingstory.ui.activity.StoryDetailActivity
+import androidx.core.util.Pair
 
 class StoriesAdapter(
     private val stories: ArrayList<ListStoryItem>,
