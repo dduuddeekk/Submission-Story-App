@@ -2,10 +2,8 @@ package com.dudek.dicodingstory.ui.activity
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -28,10 +26,8 @@ import java.util.regex.Pattern
 class LogInActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLogInBinding
-    private var isPasswordVisible = false
     private val accountViewModel: AccountViewModel by viewModels()
 
-    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLogInBinding.inflate(layoutInflater)
@@ -40,43 +36,31 @@ class LogInActivity : AppCompatActivity() {
         playAnimation()
 
         accountViewModel.email.observe(this) { email ->
-            binding.etEmail.setText(email)
+            binding.emailInput.setEmail(email)
         }
 
         accountViewModel.password.observe(this) { password ->
-            binding.etPassword.setText(password)
-        }
-
-        binding.etPassword.setOnTouchListener { _, event ->
-            if (event.action == MotionEvent.ACTION_UP) {
-                val drawableEnd = 2
-                if (event.rawX >= binding.etPassword.right - binding.etPassword.compoundDrawables[drawableEnd].bounds.width()) {
-                    togglePasswordVisibility()
-                    binding.etPassword.performClick()
-                    return@setOnTouchListener true
-                }
-            }
-            false
+            binding.passwordInput.setPassword(password)
         }
 
         binding.btLogIn.setOnClickListener {
-            val email = binding.etEmail.text.toString().trim()
-            val password = binding.etPassword.text.toString().trim()
+            val email = binding.emailInput.getEmail()
+            val password = binding.passwordInput.getPassword()
 
-            binding.etEmail.error = null
-            binding.etPassword.error = null
+            binding.emailInput.setError(null)
+            binding.passwordInput.setError(null)
 
             accountViewModel.setEmail(email)
             accountViewModel.setPassword(password)
 
             if (email.isEmpty()) {
-                binding.etEmail.error = "Email is empty."
+                binding.emailInput.setError("Email is empty.")
             } else if (!isValidEmail(email)) {
-                binding.etEmail.error = "Invalid email format."
+                binding.emailInput.setError("Invalid email format.")
             } else if (password.isEmpty()) {
-                binding.etPassword.error = "Password is empty."
+                binding.passwordInput.setError("Password is empty.")
             } else if (!isValidPassword(password)) {
-                binding.etPassword.error = "Password must be at least 8 characters."
+                binding.passwordInput.setError("Password must be at least 8 characters.")
             } else {
                 loginUser(email, password)
             }
@@ -94,21 +78,6 @@ class LogInActivity : AppCompatActivity() {
         return password.length >= 8
     }
 
-    private fun togglePasswordVisibility() {
-        val drawableStart = R.drawable.ic_lock_24
-        val drawableEnd = if (isPasswordVisible) R.drawable.ic_visibility_24 else R.drawable.ic_visibility_off_24
-        val inputType = if (isPasswordVisible) {
-            android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
-        } else {
-            android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
-        }
-
-        binding.etPassword.inputType = inputType
-        binding.etPassword.setCompoundDrawablesWithIntrinsicBounds(drawableStart, 0, drawableEnd, 0)
-        binding.etPassword.setSelection(binding.etPassword.text.length)
-        isPasswordVisible = !isPasswordVisible
-    }
-
     private fun loginUser(email: String, password: String) {
         val apiService = ApiConfig.getApiService()
         val call = apiService.login(email, password)
@@ -122,8 +91,8 @@ class LogInActivity : AppCompatActivity() {
                         val token = loginResponse.loginResult?.token
 
                         if (token != null) {
-                            saveTokenToSession(token) // Simpan token ke SessionPreference
-                            startTokenService() // Mulai TokenBackgroundService
+                            saveTokenToSession(token)
+                            startTokenService()
                         }
 
                         val intent = Intent(this@LogInActivity, MainActivity::class.java).apply {
@@ -177,8 +146,8 @@ class LogInActivity : AppCompatActivity() {
             repeatMode = ObjectAnimator.REVERSE
         }.start()
 
-        val email = ObjectAnimator.ofFloat(binding.etEmail, View.ALPHA, 1f).setDuration(2000)
-        val password = ObjectAnimator.ofFloat(binding.etPassword, View.ALPHA, 1f).setDuration(2000)
+        val email = ObjectAnimator.ofFloat(binding.emailInput, View.ALPHA, 1f).setDuration(2000)
+        val password = ObjectAnimator.ofFloat(binding.passwordInput, View.ALPHA, 1f).setDuration(2000)
         val login = ObjectAnimator.ofFloat(binding.btLogIn, View.ALPHA, 1f).setDuration(2000)
 
         val together = AnimatorSet().apply {
