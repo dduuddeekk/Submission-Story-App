@@ -36,7 +36,7 @@ class SplashActivity : AppCompatActivity() {
                         TokenBackgroundService.startService(this@SplashActivity)
                         navigateToMainActivity(token)
                     }
-                }, 3000)
+                }, 2000)
             }
         }
     }

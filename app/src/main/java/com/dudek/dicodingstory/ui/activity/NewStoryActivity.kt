@@ -82,7 +82,7 @@ class NewStoryActivity : AppCompatActivity() {
                 val description = etStory.text.toString().trim()
                 if (description.isEmpty() || viewModel.imageUri.value == null) {
                     Toast.makeText(this@NewStoryActivity, "Description or image is missing!", Toast.LENGTH_SHORT).show()
-                    Log.d("NewStoryActivity", "Description or image is missing!")
+//                    Log.d("NewStoryActivity", "Description or image is missing!") // Debugging statement
                     return@setOnClickListener
                 }
 
@@ -93,7 +93,7 @@ class NewStoryActivity : AppCompatActivity() {
                     uploadStory(viewModel.token.value!!, description, file)
                 } else {
                     Toast.makeText(this@NewStoryActivity, "Invalid file!", Toast.LENGTH_SHORT).show()
-                    Log.d("NewStoryActivity", "Selected URI: ${viewModel.imageUri.value}")
+//                    Log.d("NewStoryActivity", "Selected URI: ${viewModel.imageUri.value}") // Debugging statement
                 }
             }
         }
@@ -133,7 +133,8 @@ class NewStoryActivity : AppCompatActivity() {
             }
             tempFile
         } catch (e: Exception) {
-            Log.e("NewStoryActivity", "Error converting URI to File: ${e.message}", e)
+            Toast.makeText(this@NewStoryActivity, "Error converting URI to File: ${e.message}", Toast.LENGTH_SHORT).show()
+//            Log.e("NewStoryActivity", "Error converting URI to File: ${e.message}", e) // Debugging statement
             null
         }
     }
@@ -156,13 +157,13 @@ class NewStoryActivity : AppCompatActivity() {
                     finish()
                 } else {
                     Toast.makeText(this@NewStoryActivity, "Failed to upload: ${response.message()}", Toast.LENGTH_SHORT).show()
-                    Log.d("NewStoryActivity", "Error: ${response.message()}")
+//                    Log.d("NewStoryActivity", "Error: ${response.message()}") // Debugging statement
                 }
             }
 
             override fun onFailure(call: Call<StoryUploadResponse>, t: Throwable) {
                 Toast.makeText(this@NewStoryActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
-                Log.d("NewStoryActivity", "Failure: ${t.message}")
+//                Log.d("NewStoryActivity", "Failure: ${t.message}") // Debugging statement
             }
         })
     }
