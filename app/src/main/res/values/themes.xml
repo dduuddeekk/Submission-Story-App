@@ -26,4 +26,13 @@
         <item name="tint">?attr/colorSecondary</item>
         <item name="shapeAppearanceOverlay">@style/ShapeAppearance.Material3.Corner.Full</item>
     </style>
+
+    <style name="Widget.DicodingStory.InputField" parent="Widget.Material3.TextInputLayout.FilledBox.Dense">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">50dp</item>
+        <item name="android:background">@drawable/edit_text_background</item>
+        <item name="android:drawablePadding">10dp</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:drawableTint">?attr/colorAccent</item>
+    </style>
 </resources>

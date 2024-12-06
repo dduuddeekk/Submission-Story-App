@@ -23,4 +23,7 @@
     <string name="login_image">Login image</string>
     <string name="register_image">Register image.</string>
     <string name="log_out">Log Out.</string>
+    <string name="error_password_to_short">Password must be at least 8 characters.</string>
+    <string name="error_invalid_email">Invalid email format.</string>
+    <string name="error_invalid_name">Name must contain only letters and spaces.</string>
 </resources>

@@ -24,4 +24,7 @@
     <string name="login_image">Imagen de inicio de sesión</string>
     <string name="register_image">Imagen de registro.</string>
     <string name="log_out">Cerrar</string>
+    <string name="error_password_to_short">La contraseña debe tener al menos 8 caracteres.</string>
+    <string name="error_invalid_email">Formato de correo electrónico no válido.</string>
+    <string name="error_invalid_name">El nombre solo puede contener letras y espacios.</string>
 </resources>

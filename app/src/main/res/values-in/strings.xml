@@ -24,4 +24,7 @@
     <string name="login_image">Gambar login</string>
     <string name="register_image">Gambar daftar.</string>
     <string name="log_out">Keluar</string>
+    <string name="error_password_to_short">Password harus terdiri dari minimal 8 karakter.</string>
+    <string name="error_invalid_email">Format email tidak valid.</string>
+    <string name="error_invalid_name">Nama hanya boleh mengandung huruf dan spasi.</string>
 </resources>

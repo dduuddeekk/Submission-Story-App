@@ -41,7 +41,7 @@ class RegisterActivity : AppCompatActivity() {
 
             binding.nameInput.setError(null)
             binding.emailInput.setError(null)
-            binding.passwordInput.setError(null)
+            binding.passwordInput.setErrorMessage(null)
 
             accountViewModel.setName(name)
             accountViewModel.setEmail(email)
@@ -54,7 +54,7 @@ class RegisterActivity : AppCompatActivity() {
                 binding.emailInput.setError("Email is empty.")
             }
             if (password.isEmpty()) {
-                binding.passwordInput.setError("Password is empty.")
+                binding.passwordInput.setErrorMessage("Password is empty.")
             }
 
             if (name.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty()) {
@@ -79,7 +79,7 @@ class RegisterActivity : AppCompatActivity() {
 
     private fun isValidPassword(password: String): Boolean {
         return if (password.length < 8) {
-            binding.passwordInput.setError("Password must be at least 8 characters")
+            binding.passwordInput.setErrorMessage("Password must be at least 8 characters")
             false
         } else {
             true

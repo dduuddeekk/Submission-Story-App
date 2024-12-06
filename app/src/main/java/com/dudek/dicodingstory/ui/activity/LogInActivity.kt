@@ -8,7 +8,6 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import com.dudek.dicodingstory.R
 import com.dudek.dicodingstory.data.api.ApiConfig
 import com.dudek.dicodingstory.data.pref.SessionPreference
 import com.dudek.dicodingstory.data.response.LogInResponse
@@ -48,7 +47,7 @@ class LogInActivity : AppCompatActivity() {
             val password = binding.passwordInput.getPassword()
 
             binding.emailInput.setError(null)
-            binding.passwordInput.setError(null)
+            binding.passwordInput.setErrorMessage(null)
 
             accountViewModel.setEmail(email)
             accountViewModel.setPassword(password)
@@ -58,9 +57,9 @@ class LogInActivity : AppCompatActivity() {
             } else if (!isValidEmail(email)) {
                 binding.emailInput.setError("Invalid email format.")
             } else if (password.isEmpty()) {
-                binding.passwordInput.setError("Password is empty.")
+                binding.passwordInput.setErrorMessage("Password is empty.")
             } else if (!isValidPassword(password)) {
-                binding.passwordInput.setError("Password must be at least 8 characters.")
+                binding.passwordInput.setErrorMessage("Password must be at least 8 characters.")
             } else {
                 loginUser(email, password)
             }
