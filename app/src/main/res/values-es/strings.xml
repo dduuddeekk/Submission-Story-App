@@ -27,4 +27,5 @@
     <string name="error_password_to_short">La contraseña debe tener al menos 8 caracteres.</string>
     <string name="error_invalid_email">Formato de correo electrónico no válido.</string>
     <string name="error_invalid_name">El nombre solo puede contener letras y espacios.</string>
+    <string name="map_view">Mapa</string>
 </resources>

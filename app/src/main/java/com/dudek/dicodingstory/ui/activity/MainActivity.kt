@@ -40,6 +40,12 @@ class MainActivity : AppCompatActivity() {
             rvStoryContainer.layoutManager = LinearLayoutManager(this@MainActivity)
             fetchStories()
 
+            icMapView.setOnClickListener {
+                val intent = Intent(this@MainActivity, MapsView::class.java)
+                intent.putExtra(EXTRA_TOKEN, token)
+                startActivity(intent)
+            }
+
             icLogout.setOnClickListener {
                 stopService(Intent(this@MainActivity, TokenBackgroundService::class.java))
 

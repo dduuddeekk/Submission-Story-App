@@ -27,4 +27,5 @@
     <string name="error_password_to_short">Sandi kudu paling ora ana 8 karakter.</string>
     <string name="error_invalid_email">Format email ora sah.</string>
     <string name="error_invalid_name">Jeneng mung bisa ngemot aksara lan spasi.</string>
+    <string name="map_view">Peta</string>
 </resources>

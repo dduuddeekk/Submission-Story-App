@@ -33,6 +33,16 @@
             android:layout_gravity="end"
             app:tint="?attr/colorPrimary"
             android:layout_marginEnd="16dp"/>
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ic_map_view"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_baseline_map_24"
+            android:contentDescription="@string/map_view"
+            android:layout_gravity="end"
+            app:tint="?attr/colorPrimary"
+            android:layout_marginEnd="16dp"/>
     </androidx.appcompat.widget.Toolbar>
 
     <androidx.recyclerview.widget.RecyclerView

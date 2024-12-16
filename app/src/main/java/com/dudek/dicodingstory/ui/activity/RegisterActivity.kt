@@ -49,41 +49,30 @@ class RegisterActivity : AppCompatActivity() {
 
             if (name.isEmpty()) {
                 binding.nameInput.setError("Name is empty.")
-            }
-            if (email.isEmpty()) {
+            } else if (email.isEmpty()) {
                 binding.emailInput.setError("Email is empty.")
-            }
-            if (password.isEmpty()) {
+            } else if (!isValidEmail(email)) {
+                binding.emailInput.setError("Invalid email format.")
+            } else if (password.isEmpty()) {
                 binding.passwordInput.setErrorMessage("Password is empty.")
-            }
-
-            if (name.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty()) {
-                if (isValidEmail(email) && isValidPassword(password)) {
-                    registerUser(name, email, password)
-                }
+            } else if (!isValidPassword(password)) {
+                binding.passwordInput.setErrorMessage("Password must be at least 8 characters.")
+            } else {
+                registerUser(name, email, password)
             }
         }
     }
+
 
     private fun isValidEmail(email: String): Boolean {
         val emailPattern = Pattern.compile(
             "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
         )
-        return if (!emailPattern.matcher(email).matches()) {
-            binding.emailInput.setError("Invalid email format")
-            false
-        } else {
-            true
-        }
+        return emailPattern.matcher(email).matches()
     }
 
     private fun isValidPassword(password: String): Boolean {
-        return if (password.length < 8) {
-            binding.passwordInput.setErrorMessage("Password must be at least 8 characters")
-            false
-        } else {
-            true
-        }
+        return password.length >= 8
     }
 
     private fun registerUser(name: String, email: String, password: String) {
@@ -91,7 +80,10 @@ class RegisterActivity : AppCompatActivity() {
         val call = apiService.register(name, email, password)
 
         call.enqueue(object : Callback<RegisterResponse> {
-            override fun onResponse(call: Call<RegisterResponse>, response: Response<RegisterResponse>) {
+            override fun onResponse(
+                call: Call<RegisterResponse>,
+                response: Response<RegisterResponse>
+            ) {
                 if (response.isSuccessful) {
                     val registerResponse = response.body()
                     if (registerResponse != null && registerResponse.error == false) {
