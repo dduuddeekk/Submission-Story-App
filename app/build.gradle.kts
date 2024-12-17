@@ -74,5 +74,6 @@ dependencies {
 
     // Pagination
     implementation(libs.androidx.paging.runtime.ktx)
+    implementation(libs.androidx.room.paging)
 
 }

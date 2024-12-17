@@ -1,6 +1,7 @@
 package com.dudek.dicodingstory.ui.activity
 
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -21,11 +22,16 @@ class StoryDetailActivity : AppCompatActivity() {
         val storyId = intent.getStringExtra("EXTRA_STORY_ID")
         val token = intent.getStringExtra("EXTRA_TOKEN")
 
+        binding.progressBar.visibility = View.VISIBLE
+        binding.tvStoryDescription.visibility = View.GONE
+
         if (storyId != null && token != null) {
             storyDetailViewModel.fetchStoryDetail(storyId, token)
 
             storyDetailViewModel.storyDetail.observe(this) { story ->
                 if (story != null) {
+                    binding.progressBar.visibility = View.GONE
+                    binding.tvStoryDescription.visibility = View.VISIBLE
                     binding.tvStoryDescription.text = story.description
                     Glide.with(this)
                         .load(story.photoUrl)
@@ -35,6 +41,7 @@ class StoryDetailActivity : AppCompatActivity() {
                 }
             }
         } else {
+            binding.progressBar.visibility = View.GONE
             Toast.makeText(this, "Invalid story data", Toast.LENGTH_SHORT).show()
         }
     }

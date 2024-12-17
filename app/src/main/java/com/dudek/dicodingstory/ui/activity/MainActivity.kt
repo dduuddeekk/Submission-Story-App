@@ -2,6 +2,7 @@ package com.dudek.dicodingstory.ui.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -65,17 +66,23 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
+        binding.progressBar.visibility = View.VISIBLE
+
         lifecycleScope.launch {
             try {
                 val response = ApiConfig.getApiService().getAllStories("Bearer $token")
                 if (!response.error!!) {
                     val stories = response.listStory?.filterNotNull() ?: emptyList()
+
                     binding.rvStoryContainer.adapter = StoriesAdapter(stories, token)
+                    binding.progressBar.visibility = View.GONE
                 } else {
                     Toast.makeText(this@MainActivity, "Failed to load stories", Toast.LENGTH_SHORT).show()
+                    binding.progressBar.visibility = View.GONE
                 }
             } catch (e: Exception) {
                 Toast.makeText(this@MainActivity, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                binding.progressBar.visibility = View.GONE
             }
         }
     }
