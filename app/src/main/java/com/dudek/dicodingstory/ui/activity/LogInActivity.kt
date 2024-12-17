@@ -8,18 +8,13 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.dudek.dicodingstory.data.api.ApiConfig
 import com.dudek.dicodingstory.data.pref.SessionPreference
-import com.dudek.dicodingstory.data.response.LogInResponse
 import com.dudek.dicodingstory.databinding.ActivityLogInBinding
 import com.dudek.dicodingstory.ui.model.AccountViewModel
 import com.dudek.dicodingstory.data.service.TokenBackgroundService
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import java.util.regex.Pattern
 
 class LogInActivity : AppCompatActivity() {
@@ -78,57 +73,44 @@ class LogInActivity : AppCompatActivity() {
     }
 
     private fun loginUser(email: String, password: String) {
-        val apiService = ApiConfig.getApiService()
-        val call = apiService.login(email, password)
+        lifecycleScope.launch {
+            try {
+                val response = ApiConfig.getApiService().login(email, password)
+                if (response.error == false) {
+                    val name = response.loginResult?.name
+                    val token = response.loginResult?.token
 
-        call.enqueue(object : Callback<LogInResponse> {
-            override fun onResponse(call: Call<LogInResponse>, response: Response<LogInResponse>) {
-                if (response.isSuccessful) {
-                    val loginResponse = response.body()
-                    if (loginResponse != null && loginResponse.error == false) {
-                        val name = loginResponse.loginResult?.name
-                        val token = loginResponse.loginResult?.token
-
-                        if (token != null) {
-                            saveTokenToSession(token)
-                            startTokenService()
-                        }
-
-                        val intent = Intent(this@LogInActivity, MainActivity::class.java).apply {
-                            putExtra("EXTRA_NAME", name)
-                            putExtra("EXTRA_TOKEN", token)
-                        }
-                        startActivity(intent)
-                        finish()
-                    } else {
-                        Toast.makeText(
-                            this@LogInActivity,
-                            loginResponse?.message ?: "Unknown error",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                    if (token != null) {
+                        saveTokenToSession(token)
+                        startTokenService()
                     }
+
+                    val intent = Intent(this@LogInActivity, MainActivity::class.java).apply {
+                        putExtra("EXTRA_NAME", name)
+                        putExtra("EXTRA_TOKEN", token)
+                    }
+                    startActivity(intent)
+                    finish()
                 } else {
                     Toast.makeText(
                         this@LogInActivity,
-                        "Error: ${response.message()}",
+                        response.message ?: "Unknown error",
                         Toast.LENGTH_SHORT
                     ).show()
                 }
-            }
-
-            override fun onFailure(call: Call<LogInResponse>, t: Throwable) {
+            } catch (e: Exception) {
                 Toast.makeText(
                     this@LogInActivity,
-                    "Failed to connect: ${t.message}",
+                    "Failed to connect: ${e.message}",
                     Toast.LENGTH_SHORT
                 ).show()
             }
-        })
+        }
     }
 
     private fun saveTokenToSession(token: String) {
         val sessionPreference = SessionPreference(this)
-        CoroutineScope(Dispatchers.IO).launch {
+        lifecycleScope.launch {
             sessionPreference.saveToken(token)
         }
     }
