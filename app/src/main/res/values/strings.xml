@@ -27,5 +27,9 @@
     <string name="error_invalid_email">Invalid email format.</string>
     <string name="error_invalid_name">Name must contain only letters and spaces.</string>
     <string name="map_view">Map</string>
-    <string name="title_activity_maps_view">MapsView</string>
+    <string name="title_activity_maps_view">Maps View</string>
+    <string name="normal_type">Normal</string>
+    <string name="satellite_type">Satellite</string>
+    <string name="terrain_type">Terrain</string>
+    <string name="hybrid_type">Hybrid</string>
 </resources>

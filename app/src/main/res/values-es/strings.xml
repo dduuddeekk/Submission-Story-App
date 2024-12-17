@@ -28,4 +28,9 @@
     <string name="error_invalid_email">Formato de correo electrónico no válido.</string>
     <string name="error_invalid_name">El nombre solo puede contener letras y espacios.</string>
     <string name="map_view">Mapa</string>
+    <string name="title_activity_maps_view">Vista de Mapas</string>
+    <string name="normal_type">Normal</string>
+    <string name="satellite_type">Satélite</string>
+    <string name="terrain_type">Terreno</string>
+    <string name="hybrid_type">Híbrido</string>
 </resources>

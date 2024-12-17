@@ -28,4 +28,9 @@
     <string name="error_invalid_email">Format email tidak valid.</string>
     <string name="error_invalid_name">Nama hanya boleh mengandung huruf dan spasi.</string>
     <string name="map_view">Peta</string>
+    <string name="title_activity_maps_view">Tampilan Peta</string>
+    <string name="normal_type">Normal</string>
+    <string name="satellite_type">Satelit</string>
+    <string name="terrain_type">Medan</string>
+    <string name="hybrid_type">Gabungan</string>
 </resources>
