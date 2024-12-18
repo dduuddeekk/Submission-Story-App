@@ -4,6 +4,17 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
+data class ApiResponse(
+    @field:SerializedName("error")
+    val error: Boolean,
+
+    @field:SerializedName("message")
+    val message: String,
+
+    @field:SerializedName("listStory")
+    val listStory: List<StoriesResponseItem>
+)
+
 @Entity(tableName = "stories")
 data class StoriesResponseItem(
     @PrimaryKey

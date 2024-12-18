@@ -10,14 +10,17 @@ import kotlinx.coroutines.flow.first
 class StoriesPagingSource(
     private val apiService: ApiService,
     private val sessionPreference: SessionPreference
-): PagingSource<Int, StoriesResponseItem>() {
+) : PagingSource<Int, StoriesResponseItem>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, StoriesResponseItem> {
         return try {
             val position = params.key ?: INITIAL_PAGE_INDEX
             val token = sessionPreference.token.first()
             if (token != null) {
-                val responseData = apiService.getPageStories("Bearer $token", position, params.loadSize)
+                val response = apiService.getPageStories("Bearer $token", position, params.loadSize)
+
+                val responseData = response.listStory
+
                 LoadResult.Page(
                     data = responseData,
                     prevKey = if (position == INITIAL_PAGE_INDEX) null else position - 1,

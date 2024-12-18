@@ -34,4 +34,5 @@
     <string name="terrain_type">Medan</string>
     <string name="hybrid_type">Gabungan</string>
     <string name="include_location">Sertakan Lokasi</string>
+    <string name="retry">Coba Lagi</string>
 </resources>

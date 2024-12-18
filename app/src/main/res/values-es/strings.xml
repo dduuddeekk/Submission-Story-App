@@ -34,4 +34,5 @@
     <string name="terrain_type">Terreno</string>
     <string name="hybrid_type">Híbrido</string>
     <string name="include_location">Incluir Ubicación</string>
+    <string name="retry">Intentar otra vez</string>
 </resources>

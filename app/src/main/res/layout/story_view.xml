@@ -14,6 +14,7 @@
         android:padding="8dp"
         android:orientation="vertical"
         android:contentDescription="@string/story"
+        android:background="?attr/colorAccent"
         card_view:layout_constraintTop_toTopOf="parent"
         card_view:layout_constraintEnd_toEndOf="parent"
         card_view:layout_constraintStart_toStartOf="parent">

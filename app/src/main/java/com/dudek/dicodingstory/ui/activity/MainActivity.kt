@@ -2,6 +2,7 @@ package com.dudek.dicodingstory.ui.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -16,6 +17,7 @@ import com.dudek.dicodingstory.ui.adapter.StoriesAdapter
 import com.dudek.dicodingstory.data.service.TokenBackgroundService
 import com.dudek.dicodingstory.database.StoriesDatabase
 import com.dudek.dicodingstory.database.repositories.StoriesRepository
+import com.dudek.dicodingstory.ui.adapter.LoadingStateAdapter
 import com.dudek.dicodingstory.ui.factory.MainViewModelFactory
 import com.dudek.dicodingstory.ui.model.MainViewModel
 import kotlinx.coroutines.Dispatchers
@@ -77,7 +79,9 @@ class MainActivity : AppCompatActivity() {
     private fun setupRecyclerView() {
         val storiesAdapter = StoriesAdapter(token)
 
-        binding.rvStoryContainer.adapter = storiesAdapter
+        binding.rvStoryContainer.adapter = storiesAdapter.withLoadStateFooter(
+            footer = LoadingStateAdapter { storiesAdapter.retry() }
+        )
 
         if (!token.isNullOrEmpty()) {
             mainViewModel.stories.observe(this) { pagingData ->
@@ -91,7 +95,9 @@ class MainActivity : AppCompatActivity() {
             binding.progressBar.visibility = if (loadState.refresh is LoadState.Loading) View.VISIBLE else View.GONE
 
             if (loadState.refresh is LoadState.Error) {
-                Toast.makeText(this, "Failed to load stories", Toast.LENGTH_SHORT).show()
+                val errorMessage = (loadState.refresh as LoadState.Error).error.localizedMessage
+                Log.d("MainActivity", "Failed to load stories: $errorMessage")
+                Toast.makeText(this, "Failed to load stories.", Toast.LENGTH_SHORT).show()
             }
         }
     }

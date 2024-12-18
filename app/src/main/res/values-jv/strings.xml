@@ -34,4 +34,5 @@
     <string name="terrain_type">Ladang</string>
     <string name="hybrid_type">Gabungan</string>
     <string name="include_location">Kalebet Lokasi</string>
+    <string name="retry">Coba Maneh</string>
 </resources>
