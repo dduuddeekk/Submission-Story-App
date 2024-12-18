@@ -26,9 +26,6 @@ class AccountActivity : AppCompatActivity() {
             btRegister.setOnClickListener {
                 startActivity(Intent(this@AccountActivity, RegisterActivity::class.java))
             }
-//            tvGuest.setOnClickListener {
-//                startActivity(Intent(this@AccountActivity, MainActivity::class.java))
-//            }
         }
     }
 

@@ -14,7 +14,6 @@ class NewStoryViewModel : ViewModel() {
     val imageUri: LiveData<Uri?> get() = _imageUri
 
     private val _description = MutableLiveData<String>()
-//    val description: LiveData<String> get() = _description (never used)
 
     fun setToken(token: String) {
         _token.value = token

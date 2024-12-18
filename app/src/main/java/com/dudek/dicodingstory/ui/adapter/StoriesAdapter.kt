@@ -30,10 +30,6 @@ class StoriesAdapter(
         }
     }
 
-    override fun getItemCount(): Int {
-        return super.getItemCount()
-    }
-
     class StoriesViewHolder(private val binding: StoryViewBinding) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(story: StoriesResponseItem, token: String?) {

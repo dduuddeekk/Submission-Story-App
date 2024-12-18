@@ -2,7 +2,6 @@ package com.dudek.dicodingstory.ui.activity
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -88,8 +87,6 @@ class MainActivity : AppCompatActivity() {
             binding.progressBar.visibility = if (loadState.refresh is LoadState.Loading) View.VISIBLE else View.GONE
 
             if (loadState.refresh is LoadState.Error) {
-                val errorMessage = (loadState.refresh as LoadState.Error).error.localizedMessage
-                Log.d("MainActivity", "Failed to load stories: $errorMessage")
                 Toast.makeText(this, "Failed to load stories.", Toast.LENGTH_SHORT).show()
             }
         }
