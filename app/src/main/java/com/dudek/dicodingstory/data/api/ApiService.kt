@@ -5,6 +5,7 @@ import com.dudek.dicodingstory.data.response.RegisterResponse
 import com.dudek.dicodingstory.data.response.StoriesResponse
 import com.dudek.dicodingstory.data.response.StoryDetailResponse
 import com.dudek.dicodingstory.data.response.StoryUploadResponse
+import com.dudek.dicodingstory.database.response.StoriesResponseItem
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.*
@@ -40,12 +41,12 @@ interface ApiService {
         @Header("Authorization") token: String
     ): StoriesResponse
 
-//    @GET("stories")
-//    suspend fun getPageStories(
-//        @Header("Authorization") token: String,
-//        @Query("page") page: Int,
-//        @Query("size") size: Int
-//    ): List
+    @GET("stories")
+    suspend fun getPageStories(
+        @Header("Authorization") token: String,
+        @Query("page") page: Int,
+        @Query("size") size: Int
+    ): List<StoriesResponseItem>
 
     @GET("stories/{id}")
     suspend fun getStoryDetail(
