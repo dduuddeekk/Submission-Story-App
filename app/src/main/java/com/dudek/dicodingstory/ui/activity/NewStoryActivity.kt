@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.database.Cursor
+import android.location.Location
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -19,6 +20,8 @@ import com.bumptech.glide.Glide
 import com.dudek.dicodingstory.data.api.ApiConfig
 import com.dudek.dicodingstory.databinding.ActivityNewStoryBinding
 import com.dudek.dicodingstory.ui.model.NewStoryViewModel
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -34,6 +37,10 @@ class NewStoryActivity : AppCompatActivity() {
     private lateinit var binding: ActivityNewStoryBinding
     private val viewModel: NewStoryViewModel by viewModels()
 
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private var latitude: Double? = null
+    private var longitude: Double? = null
+
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
             if (!isGranted) {
@@ -45,6 +52,8 @@ class NewStoryActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityNewStoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         checkAndRequestPermissions()
 
@@ -76,6 +85,15 @@ class NewStoryActivity : AppCompatActivity() {
                 finish()
             }
 
+            swIncludeLocation.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked) {
+                    getCurrentLocation()
+                } else {
+                    latitude = null
+                    longitude = null
+                }
+            }
+
             btUpload.setOnClickListener {
                 val description = etStory.text.toString().trim()
                 if (description.isEmpty() || viewModel.imageUri.value == null) {
@@ -85,7 +103,7 @@ class NewStoryActivity : AppCompatActivity() {
 
                 val file = uriToFile(viewModel.imageUri.value!!)
                 if (file != null) {
-                    uploadStory(viewModel.token.value!!, description, file)
+                    uploadStory(viewModel.token.value!!, description, file, latitude, longitude)
                 } else {
                     Toast.makeText(this@NewStoryActivity, "Invalid file!", Toast.LENGTH_SHORT).show()
                 }
@@ -132,16 +150,41 @@ class NewStoryActivity : AppCompatActivity() {
         }
     }
 
-    private fun uploadStory(token: String, description: String, photoFile: File) {
+    private fun getCurrentLocation() {
+        if (ContextCompat.checkSelfPermission(
+            this, Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
+                if (location != null) {
+                    latitude = location.latitude
+                    longitude = location.longitude
+                } else {
+                    Toast.makeText(this, "Location is not found. Try again!", Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }
+        } else {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                102
+            )
+        }
+    }
+
+    private fun uploadStory(token: String, description: String, photoFile: File, lat: Double?, lon: Double?) {
         val descriptionBody = description.toRequestBody("text/plain".toMediaTypeOrNull())
         val photoBody = MultipartBody.Part.createFormData(
             "photo", photoFile.name, photoFile.asRequestBody("image/*".toMediaTypeOrNull())
         )
+        val latBody = lat?.toString()?.toRequestBody("text/plain".toMediaTypeOrNull())
+        val lonBody = lon?.toString()?.toRequestBody("text/plain".toMediaTypeOrNull())
 
         lifecycleScope.launch {
             try {
                 val response = withContext(Dispatchers.IO) {
-                    ApiConfig.getApiService().uploadStory("Bearer $token", descriptionBody, photoBody)
+                    ApiConfig.getApiService().uploadStory("Bearer $token", descriptionBody, photoBody, latBody, lonBody)
                 }
                 if (response.error == false) {
                     Toast.makeText(this@NewStoryActivity, "Story uploaded successfully!", Toast.LENGTH_SHORT).show()

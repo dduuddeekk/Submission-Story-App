@@ -4,14 +4,20 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dudek.dicodingstory.data.api.ApiConfig
 import com.dudek.dicodingstory.data.pref.SessionPreference
 import com.dudek.dicodingstory.databinding.ActivityMainBinding
 import com.dudek.dicodingstory.ui.adapter.StoriesAdapter
 import com.dudek.dicodingstory.data.service.TokenBackgroundService
+import com.dudek.dicodingstory.database.StoriesDatabase
+import com.dudek.dicodingstory.database.repositories.StoriesRepository
+import com.dudek.dicodingstory.ui.factory.MainViewModelFactory
+import com.dudek.dicodingstory.ui.model.MainViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -19,6 +25,14 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private var token: String? = null
+
+    private val mainViewModel: MainViewModel by viewModels {
+        MainViewModelFactory(StoriesRepository(
+            storiesDatabase = StoriesDatabase.getDatabase(this),
+            apiService = ApiConfig.getApiService(),
+            sessionPreference = SessionPreference(this)
+        ))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,7 +49,6 @@ class MainActivity : AppCompatActivity() {
             }
 
             rvStoryContainer.layoutManager = LinearLayoutManager(this@MainActivity)
-            fetchStories()
 
             icMapView.setOnClickListener {
                 val intent = Intent(this@MainActivity, MapsView::class.java)
@@ -46,9 +59,8 @@ class MainActivity : AppCompatActivity() {
             icLogout.setOnClickListener {
                 stopService(Intent(this@MainActivity, TokenBackgroundService::class.java))
 
-                val sessionPreference = SessionPreference(this@MainActivity)
                 lifecycleScope.launch(Dispatchers.IO) {
-                    sessionPreference.saveToken("")
+                    SessionPreference(this@MainActivity).saveToken("")
                 }
 
                 token = null
@@ -58,31 +70,28 @@ class MainActivity : AppCompatActivity() {
                 finish()
             }
         }
+
+        setupRecyclerView()
     }
 
-    private fun fetchStories() {
-        if (token.isNullOrEmpty()) {
+    private fun setupRecyclerView() {
+        val storiesAdapter = StoriesAdapter(token)
+
+        binding.rvStoryContainer.adapter = storiesAdapter
+
+        if (!token.isNullOrEmpty()) {
+            mainViewModel.stories.observe(this) { pagingData ->
+                storiesAdapter.submitData(lifecycle, pagingData)
+            }
+        } else {
             Toast.makeText(this, "Token not found", Toast.LENGTH_SHORT).show()
-            return
         }
 
-        binding.progressBar.visibility = View.VISIBLE
+        storiesAdapter.addLoadStateListener { loadState ->
+            binding.progressBar.visibility = if (loadState.refresh is LoadState.Loading) View.VISIBLE else View.GONE
 
-        lifecycleScope.launch {
-            try {
-                val response = ApiConfig.getApiService().getAllStories("Bearer $token")
-                if (!response.error!!) {
-                    val stories = response.listStory?.filterNotNull() ?: emptyList()
-
-                    binding.rvStoryContainer.adapter = StoriesAdapter(stories, token)
-                    binding.progressBar.visibility = View.GONE
-                } else {
-                    Toast.makeText(this@MainActivity, "Failed to load stories", Toast.LENGTH_SHORT).show()
-                    binding.progressBar.visibility = View.GONE
-                }
-            } catch (e: Exception) {
-                Toast.makeText(this@MainActivity, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
-                binding.progressBar.visibility = View.GONE
+            if (loadState.refresh is LoadState.Error) {
+                Toast.makeText(this, "Failed to load stories", Toast.LENGTH_SHORT).show()
             }
         }
     }
