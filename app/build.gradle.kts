@@ -94,6 +94,5 @@ dependencies {
     androidTestImplementation(libs.mockito.inline)
     testImplementation(libs.androidx.core.testing)
     testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.mockito.core)
-    testImplementation(libs.mockito.inline)
+    testImplementation("io.mockk:mockk:1.13.13")
 }

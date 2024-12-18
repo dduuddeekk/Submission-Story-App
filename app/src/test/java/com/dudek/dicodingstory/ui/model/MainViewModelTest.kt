@@ -1,7 +1,6 @@
 package com.dudek.dicodingstory.ui.model
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.AsyncPagingDataDiffer
 import androidx.paging.PagingData
@@ -14,28 +13,25 @@ import com.dudek.dicodingstory.database.repositories.StoriesRepository
 import com.dudek.dicodingstory.database.response.StoriesResponseItem
 import com.dudek.dicodingstory.getOrAwaitValue
 import com.dudek.dicodingstory.ui.adapter.StoriesAdapter
+import io.mockk.coEvery
+import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.Mock
-import org.mockito.Mockito
-import org.mockito.junit.MockitoJUnitRunner
 
 @ExperimentalCoroutinesApi
-@RunWith(MockitoJUnitRunner::class)
-class MainViewModelTest{
+class MainViewModelTest {
+
     @get:Rule
     val instantExecutorRule = InstantTaskExecutorRule()
 
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-    @Mock
-    private lateinit var storiesRepository: StoriesRepository
+    private val storiesRepository: StoriesRepository = mockk()
 
     @Test
     fun `when Get Stories Should Not Null and Return Data`() = runTest {
@@ -43,7 +39,8 @@ class MainViewModelTest{
         val data: PagingData<StoriesResponseItem> = StoriesPagingSource.snapshot(dummyStories)
         val expectedStories = MutableLiveData<PagingData<StoriesResponseItem>>()
         expectedStories.value = data
-        Mockito.`when`(storiesRepository.getStory()).thenReturn(expectedStories)
+
+        coEvery { storiesRepository.getStory() } returns expectedStories
 
         val mainViewModel = MainViewModel(storiesRepository)
         val actualStories: PagingData<StoriesResponseItem> = mainViewModel.stories.getOrAwaitValue()
@@ -66,7 +63,8 @@ class MainViewModelTest{
         val data: PagingData<StoriesResponseItem> = PagingData.from(emptyList())
         val expectedStories = MutableLiveData<PagingData<StoriesResponseItem>>()
         expectedStories.value = data
-        Mockito.`when`(storiesRepository.getStory()).thenReturn(expectedStories)
+
+        coEvery { storiesRepository.getStory() } returns expectedStories
 
         val mainViewModel = MainViewModel(storiesRepository)
         val actualStories: PagingData<StoriesResponseItem> = mainViewModel.stories.getOrAwaitValue()
@@ -80,6 +78,7 @@ class MainViewModelTest{
         differ.submitData(actualStories)
 
         Assert.assertNotNull(differ.snapshot())
+        Assert.assertTrue(differ.snapshot().isEmpty())
     }
 }
 
