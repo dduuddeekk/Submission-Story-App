@@ -38,9 +38,14 @@ interface ApiService {
     @GET("stories")
     suspend fun getAllStories(
         @Header("Authorization") token: String
-        // @Query("page") page: Int = 1,
-        // @Query("size") size: Int = 0
     ): StoriesResponse
+
+//    @GET("stories")
+//    suspend fun getPageStories(
+//        @Header("Authorization") token: String,
+//        @Query("page") page: Int,
+//        @Query("size") size: Int
+//    ): List
 
     @GET("stories/{id}")
     suspend fun getStoryDetail(
