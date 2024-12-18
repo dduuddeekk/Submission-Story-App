@@ -10,13 +10,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.dudek.dicodingstory.data.api.ApiConfig
 import com.dudek.dicodingstory.data.pref.SessionPreference
 import com.dudek.dicodingstory.databinding.ActivityMainBinding
 import com.dudek.dicodingstory.ui.adapter.StoriesAdapter
 import com.dudek.dicodingstory.data.service.TokenBackgroundService
-import com.dudek.dicodingstory.database.StoriesDatabase
-import com.dudek.dicodingstory.database.repositories.StoriesRepository
 import com.dudek.dicodingstory.ui.adapter.LoadingStateAdapter
 import com.dudek.dicodingstory.ui.factory.MainViewModelFactory
 import com.dudek.dicodingstory.ui.model.MainViewModel
@@ -29,11 +26,7 @@ class MainActivity : AppCompatActivity() {
     private var token: String? = null
 
     private val mainViewModel: MainViewModel by viewModels {
-        MainViewModelFactory(StoriesRepository(
-            storiesDatabase = StoriesDatabase.getDatabase(this),
-            apiService = ApiConfig.getApiService(),
-            sessionPreference = SessionPreference(this)
-        ))
+        MainViewModelFactory.getInstance(this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

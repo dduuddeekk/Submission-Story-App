@@ -9,6 +9,7 @@ import com.dudek.dicodingstory.database.repositories.StoriesRepository
 import com.dudek.dicodingstory.database.response.StoriesResponseItem
 
 class MainViewModel(storiesRepository: StoriesRepository) : ViewModel() {
+
     val stories: LiveData<PagingData<StoriesResponseItem>> =
         storiesRepository.getStory().cachedIn(viewModelScope)
 }
