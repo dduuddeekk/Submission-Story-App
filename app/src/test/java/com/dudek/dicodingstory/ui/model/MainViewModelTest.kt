@@ -53,8 +53,13 @@ class MainViewModelTest {
         )
         differ.submitData(actualStories)
 
+        // Memastikan data tidak null
         Assert.assertNotNull(differ.snapshot())
+
+        // Memastikan jumlah data sesuai dengan yang diharapkan
         Assert.assertEquals(dummyStories.size, differ.snapshot().size)
+
+        // Memastikan data pertama yang dikembalikan sesuai
         Assert.assertEquals(dummyStories[0], differ.snapshot()[0])
     }
 
@@ -77,6 +82,7 @@ class MainViewModelTest {
         )
         differ.submitData(actualStories)
 
+        // Memastikan jumlah data yang dikembalikan nol
         Assert.assertNotNull(differ.snapshot())
         Assert.assertTrue(differ.snapshot().isEmpty())
     }
