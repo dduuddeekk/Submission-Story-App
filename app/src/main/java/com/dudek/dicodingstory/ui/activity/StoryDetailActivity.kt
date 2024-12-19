@@ -22,20 +22,29 @@ class StoryDetailActivity : AppCompatActivity() {
         val storyId = intent.getStringExtra("EXTRA_STORY_ID")
         val token = intent.getStringExtra("EXTRA_TOKEN")
 
-        binding.progressBar.visibility = View.VISIBLE
-        binding.tvStoryDescription.visibility = View.GONE
+        binding.apply {
+            progressBar.visibility = View.VISIBLE
+            ivStoryCover.visibility = View.GONE
+            tvUserStory.visibility = View.GONE
+            tvStoryDescription.visibility = View.GONE
+        }
 
         if (storyId != null && token != null) {
             storyDetailViewModel.fetchStoryDetail(storyId, token)
 
             storyDetailViewModel.storyDetail.observe(this) { story ->
                 if (story != null) {
-                    binding.progressBar.visibility = View.GONE
-                    binding.tvStoryDescription.visibility = View.VISIBLE
-                    binding.tvStoryDescription.text = story.description
-                    Glide.with(this)
-                        .load(story.photoUrl)
-                        .into(binding.ivStoryCover)
+                    binding.apply {
+                        progressBar.visibility = View.GONE
+                        ivStoryCover.visibility = View.VISIBLE
+                        tvUserStory.visibility = View.VISIBLE
+                        tvStoryDescription.visibility = View.VISIBLE
+                        tvUserStory.text = story.name
+                        tvStoryDescription.text = story.description
+                        Glide.with(this@StoryDetailActivity)
+                            .load(story.photoUrl)
+                            .into(ivStoryCover)
+                    }
                 } else {
                     Toast.makeText(this, "Failed to load story details", Toast.LENGTH_SHORT).show()
                 }

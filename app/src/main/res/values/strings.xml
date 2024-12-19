@@ -34,4 +34,5 @@
     <string name="hybrid_type">Hybrid</string>
     <string name="include_location">Include Location</string>
     <string name="retry">Try Again</string>
+    <string name="user_name">User Name</string>
 </resources>

@@ -27,6 +27,7 @@ class StoryDetailViewModel(application: Application) : AndroidViewModel(applicat
                         _storyDetail.value = StoryDetail(
                             id = story.id.orEmpty(),
                             photoUrl = story.photoUrl.orEmpty(),
+                            name = story.name.orEmpty(),
                             description = story.description.orEmpty()
                         )
                     } ?: run {
@@ -45,5 +46,6 @@ class StoryDetailViewModel(application: Application) : AndroidViewModel(applicat
 data class StoryDetail(
     val id: String,
     val photoUrl: String,
+    val name: String,
     val description: String
 )
