@@ -32,10 +32,10 @@ interface ApiService {
     @POST("stories")
     suspend fun uploadStory(
         @Header("Authorization") token: String,
-        @Part("description") description: String,
+        @Part("description") description: RequestBody,
         @Part photo: MultipartBody.Part,
-        @Part("lat") lat: Double? = null,
-        @Part("lon") lon: Double? = null
+        @Part("lat") lat: RequestBody? = null,
+        @Part("lon") lon: RequestBody? = null
     ): StoryUploadResponse
 
     @GET("stories")

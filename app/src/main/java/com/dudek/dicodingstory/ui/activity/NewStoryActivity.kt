@@ -4,14 +4,14 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.database.Cursor
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.location.Location
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.OpenableColumns
-import android.util.Log
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -30,9 +30,9 @@ import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 import java.io.FileOutputStream
-import java.io.InputStream
 
 class NewStoryActivity : AppCompatActivity() {
 
@@ -42,6 +42,22 @@ class NewStoryActivity : AppCompatActivity() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var latitude: Double? = null
     private var longitude: Double? = null
+
+    private var imageUriFromGallery: Uri? = null
+
+    private val selectImageLauncher =
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+            if (uri != null) {
+                imageUriFromGallery = uri
+                Glide.with(this)
+                    .load(uri)
+                    .into(binding.ivCover)
+            } else {
+                Glide.with(this)
+                    .load(R.drawable.ic_insert_photo_24)
+                    .into(binding.ivCover)
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,6 +94,10 @@ class NewStoryActivity : AppCompatActivity() {
                 finish()
             }
 
+            ibGallery.setOnClickListener {
+                selectImageLauncher.launch("image/*")
+            }
+
             swIncludeLocation.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
                     getCurrentLocation()
@@ -89,11 +109,11 @@ class NewStoryActivity : AppCompatActivity() {
 
             btUpload.setOnClickListener {
                 val description = etStory.text.toString()
-                viewModel.setDescription(description)
-                if (description.isNotEmpty() && imageUri != null) {
-                    uploadStory(token, description, imageUri, latitude, longitude)
+                val currentImageUri = imageUriFromGallery?.toString() ?: imageUri
+                if (description.isNotEmpty() && currentImageUri != null) {
+                    uploadStory(token, description, currentImageUri, latitude, longitude)
                 } else {
-                    Toast.makeText(this@NewStoryActivity, "Description cannot be empty!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@NewStoryActivity, "Description and image cannot be empty!", Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -134,24 +154,27 @@ class NewStoryActivity : AppCompatActivity() {
 
     private fun uploadStory(token: String, description: String, imageUri: String, latitude: Double?, longitude: Double?) {
         val image = Uri.parse(imageUri)
-        Log.d("NewStoryActivity", "Parsed URI: $image")
 
         val imageFile = uriToFile(this, image)
-        Log.d("NewStoryActivity", "Image File: ${imageFile?.absolutePath}")
 
         if (imageFile == null) {
             Toast.makeText(this, "Failed to convert image to file", Toast.LENGTH_SHORT).show()
             return
         }
 
+        val compressedFile = compressImage(imageFile)
         val imageBody = MultipartBody.Part.createFormData(
-            "photo", imageFile.name, imageFile.asRequestBody("image/*".toMediaTypeOrNull())
+            "photo", compressedFile.name, compressedFile.asRequestBody("image/*".toMediaTypeOrNull())
         )
+
+        val descriptionBody = description.toRequestBody("text/plain".toMediaTypeOrNull())
+        val latBody = latitude?.toString()?.toRequestBody("text/plain".toMediaTypeOrNull())
+        val lonBody = longitude?.toString()?.toRequestBody("text/plain".toMediaTypeOrNull())
 
         lifecycleScope.launch {
             try {
                 val response = withContext(Dispatchers.IO) {
-                    ApiConfig.getApiService().uploadStory("Bearer $token", description, imageBody, latitude, longitude)
+                    ApiConfig.getApiService().uploadStory("Bearer $token", descriptionBody, imageBody, latBody, lonBody)
                 }
                 if (!response.error!!) {
                     Toast.makeText(this@NewStoryActivity, "Story uploaded successfully!", Toast.LENGTH_SHORT).show()
@@ -169,6 +192,17 @@ class NewStoryActivity : AppCompatActivity() {
         }
     }
 
+    private fun compressImage(file: File): File {
+        val bitmap = BitmapFactory.decodeFile(file.absolutePath)
+
+        val compressedFile = File(cacheDir, "compressed_${file.name}")
+        FileOutputStream(compressedFile).use { outputStream ->
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 80, outputStream)
+        }
+
+        return compressedFile
+    }
+
     private fun uriToFile(context: Context, uri: Uri): File? {
         return try {
             val contentResolver = context.contentResolver
@@ -181,7 +215,6 @@ class NewStoryActivity : AppCompatActivity() {
             }
             file
         } catch (e: Exception) {
-            Log.e("NewStoryActivity", "Error converting URI to file: ${e.message}")
             null
         }
     }
@@ -196,6 +229,7 @@ class NewStoryActivity : AppCompatActivity() {
     }
 
     companion object {
+        private const val TAG = "NewStoryActivity"
         private const val EXTRA_TOKEN = "EXTRA_TOKEN"
         private const val IMAGE_URI = "image_uri"
         private const val REQUEST_PERMISSIONS = 101
