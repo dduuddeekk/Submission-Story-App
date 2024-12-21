@@ -10,6 +10,7 @@ import com.dudek.dicodingstory.database.response.StoriesResponseItem
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.*
+import java.io.File
 
 interface ApiService {
     @FormUrlEncoded
@@ -31,15 +32,16 @@ interface ApiService {
     @POST("stories")
     suspend fun uploadStory(
         @Header("Authorization") token: String,
-        @Part("description") description: RequestBody,
+        @Part("description") description: String,
         @Part photo: MultipartBody.Part,
-        @Part("lat") lat: RequestBody? = null,
-        @Part("lon") lon: RequestBody? = null
+        @Part("lat") lat: Double? = null,
+        @Part("lon") lon: Double? = null
     ): StoryUploadResponse
 
     @GET("stories")
     suspend fun getAllStories(
-        @Header("Authorization") token: String
+        @Header("Authorization") token: String,
+        @Query("location") location: Int? = 0 // penambahan location=1|0 agar tidak redudansi
     ): StoriesResponse
 
     @GET("stories")

@@ -102,7 +102,7 @@ class MapsView : AppCompatActivity(), OnMapReadyCallback {
         lifecycleScope.launch {
             try {
                 val apiService = ApiConfig.getApiService()
-                val call = apiService.getAllStories(token)
+                val call = apiService.getAllStories(token, 1) // digunakan di sini
                 val stories = call.listStory?.filterNotNull() ?: emptyList()
 
                 addMarkerToMap(stories)

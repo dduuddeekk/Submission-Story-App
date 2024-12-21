@@ -1,22 +1,21 @@
 package com.dudek.dicodingstory.ui.activity
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.database.Cursor
 import android.location.Location
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.OpenableColumns
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
+import com.dudek.dicodingstory.R
 import com.dudek.dicodingstory.data.api.ApiConfig
 import com.dudek.dicodingstory.databinding.ActivityNewStoryBinding
 import com.dudek.dicodingstory.ui.model.NewStoryViewModel
@@ -28,9 +27,7 @@ import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
-import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
-import java.io.FileOutputStream
 
 class NewStoryActivity : AppCompatActivity() {
 
@@ -41,46 +38,37 @@ class NewStoryActivity : AppCompatActivity() {
     private var latitude: Double? = null
     private var longitude: Double? = null
 
-    private val requestPermissionLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
-            if (!isGranted) {
-                Toast.makeText(this, "Permission denied to access media.", Toast.LENGTH_SHORT).show()
-            }
-        }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityNewStoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-
-        checkAndRequestPermissions()
-
-        val token = intent.getStringExtra("EXTRA_TOKEN")
-        val imageUri = intent.getStringExtra("image_uri")?.let { Uri.parse(it) }
-
+        val token = intent.getStringExtra(EXTRA_TOKEN)
+        viewModel.setToken(token ?: "")
         if (token.isNullOrEmpty()) {
             Toast.makeText(this, "Token is required to upload stories!", Toast.LENGTH_SHORT).show()
             finish()
             return
         }
 
-        viewModel.setToken(token)
-        viewModel.setImageUri(imageUri)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-        viewModel.imageUri.observe(this) { uri ->
-            uri?.let {
-                Glide.with(this)
-                    .load(it)
-                    .into(binding.ivCover)
-            }
-        }
+        val imageUri = intent.getStringExtra(IMAGE_URI)
 
         binding.apply {
+            if (imageUri.isNullOrEmpty()) {
+                Glide.with(this@NewStoryActivity)
+                    .load(R.drawable.ic_insert_photo_24)
+                    .into(ivCover)
+            } else {
+                Glide.with(this@NewStoryActivity)
+                    .load(imageUri)
+                    .into(ivCover)
+            }
+
             ibCamera.setOnClickListener {
                 val intent = Intent(this@NewStoryActivity, CameraActivity::class.java)
-                intent.putExtra("EXTRA_TOKEN", viewModel.token.value)
+                intent.putExtra(EXTRA_TOKEN, token)
                 startActivity(intent)
                 finish()
             }
@@ -95,64 +83,45 @@ class NewStoryActivity : AppCompatActivity() {
             }
 
             btUpload.setOnClickListener {
-                val description = etStory.text.toString().trim()
-                if (description.isEmpty() || viewModel.imageUri.value == null) {
-                    Toast.makeText(this@NewStoryActivity, "Description or image is missing!", Toast.LENGTH_SHORT).show()
-                    return@setOnClickListener
-                }
-
-                val file = uriToFile(viewModel.imageUri.value!!)
-                if (file != null) {
-                    uploadStory(viewModel.token.value!!, description, file, latitude, longitude)
+                val description = etStory.text.toString()
+                viewModel.setDescription(description)
+                if (description.isNotEmpty() && imageUri != null) {
+                    uploadStory(token, description, imageUri, latitude, longitude)
                 } else {
-                    Toast.makeText(this@NewStoryActivity, "Invalid file!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@NewStoryActivity, "Description cannot be empty!", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
                 }
             }
         }
-    }
 
-    private fun checkAndRequestPermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissionLauncher.launch(Manifest.permission.READ_MEDIA_IMAGES)
+            if (ContextCompat.checkSelfPermission(
+                    this, Manifest.permission.READ_MEDIA_IMAGES
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.READ_MEDIA_IMAGES),
+                    REQUEST_READ_MEDIA_IMAGES
+                )
             }
         } else {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(
+                    this, Manifest.permission.READ_EXTERNAL_STORAGE
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
                 ActivityCompat.requestPermissions(
                     this,
                     arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-                    101
+                    REQUEST_READ_EXTERNAL_STORAGE
                 )
             }
         }
     }
 
-    private fun uriToFile(uri: Uri): File? {
-        return try {
-            val cursor: Cursor? = contentResolver.query(uri, null, null, null, null)
-            val name = cursor?.use {
-                if (it.moveToFirst()) {
-                    it.getString(it.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME))
-                } else null
-            } ?: "temp_image.jpg"
-
-            val inputStream = contentResolver.openInputStream(uri)
-            val tempFile = File(cacheDir, name)
-            inputStream?.use { input ->
-                FileOutputStream(tempFile).use { output ->
-                    input.copyTo(output)
-                }
-            }
-            tempFile
-        } catch (e: Exception) {
-            Toast.makeText(this@NewStoryActivity, "Error converting URI to File: ${e.message}", Toast.LENGTH_SHORT).show()
-            null
-        }
-    }
-
     private fun getCurrentLocation() {
         if (ContextCompat.checkSelfPermission(
-            this, Manifest.permission.ACCESS_FINE_LOCATION
+                this, Manifest.permission.ACCESS_FINE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED
         ) {
             fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
@@ -173,18 +142,23 @@ class NewStoryActivity : AppCompatActivity() {
         }
     }
 
-    private fun uploadStory(token: String, description: String, photoFile: File, lat: Double?, lon: Double?) {
-        val descriptionBody = description.toRequestBody("text/plain".toMediaTypeOrNull())
-        val photoBody = MultipartBody.Part.createFormData(
-            "photo", photoFile.name, photoFile.asRequestBody("image/*".toMediaTypeOrNull())
+    private fun uploadStory(token: String, description: String, imageUri: String, latitude: Double?, longitude: Double?) {
+        val image = Uri.parse(imageUri)
+        val imageFile = uriToFile(this, image)
+
+        if (imageFile == null) {
+            Toast.makeText(this, "Failed to convert image to file", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val imageBody = MultipartBody.Part.createFormData(
+            "photo", imageFile.name, imageFile.asRequestBody("image/*".toMediaTypeOrNull())
         )
-        val latBody = lat?.toString()?.toRequestBody("text/plain".toMediaTypeOrNull())
-        val lonBody = lon?.toString()?.toRequestBody("text/plain".toMediaTypeOrNull())
 
         lifecycleScope.launch {
             try {
                 val response = withContext(Dispatchers.IO) {
-                    ApiConfig.getApiService().uploadStory("Bearer $token", descriptionBody, photoBody, latBody, lonBody)
+                    ApiConfig.getApiService().uploadStory("Bearer $token", description, imageBody, latitude, longitude)
                 }
                 if (response.error == false) {
                     Toast.makeText(this@NewStoryActivity, "Story uploaded successfully!", Toast.LENGTH_SHORT).show()
@@ -200,5 +174,61 @@ class NewStoryActivity : AppCompatActivity() {
                 Toast.makeText(this@NewStoryActivity, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    private fun uriToFile(context: Context, uri: Uri): File? {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                REQUEST_READ_EXTERNAL_STORAGE
+            )
+            return null
+        }
+
+        val file = File(context.cacheDir, "temp_image.jpg")
+
+        try {
+            context.contentResolver.openInputStream(uri)?.use { inputStream ->
+                file.outputStream().use { outputStream ->
+                    inputStream.copyTo(outputStream)
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return null
+        }
+
+        return file
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            when (requestCode) {
+                REQUEST_READ_EXTERNAL_STORAGE -> {
+                    Toast.makeText(this, "Storage permission granted", Toast.LENGTH_SHORT).show()
+                }
+                REQUEST_READ_MEDIA_IMAGES -> {
+                    Toast.makeText(this, "Media access permission granted", Toast.LENGTH_SHORT).show()
+                }
+            }
+        } else {
+            when (requestCode) {
+                REQUEST_READ_EXTERNAL_STORAGE -> {
+                    Toast.makeText(this, "Storage permission denied", Toast.LENGTH_SHORT).show()
+                }
+                REQUEST_READ_MEDIA_IMAGES -> {
+                    Toast.makeText(this, "Media access permission denied", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    companion object {
+        private const val EXTRA_TOKEN = "EXTRA_TOKEN"
+        private const val IMAGE_URI = "image_uri"
+        private const val REQUEST_READ_MEDIA_IMAGES = 101
+        private const val REQUEST_READ_EXTERNAL_STORAGE = 102
     }
 }

@@ -9,6 +9,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -28,18 +29,23 @@ class CameraActivity : AppCompatActivity() {
     private var isBackCamera = true
     private var imageCapture: ImageCapture? = null
     private var token: String? = null
+    private var cameraProvider: ProcessCameraProvider? = null
 
     private val selectImageLauncher =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+            Log.d(TAG, "Selected image URI: $uri")
             uri?.let {
-                val file = File(cacheDir, "gallery_image.jpg")
-                contentResolver.openInputStream(it)?.use { input ->
-                    file.outputStream().use { output ->
-                        input.copyTo(output)
-                    }
+                // Mengecek apakah file picker URI dapat diakses
+                try {
+                    val inputStream = contentResolver.openInputStream(uri)
+                    inputStream?.close()
+
+                    // Kirimkan URI ke NewStoryActivity
+                    sendImageToNewStoryActivity(it, token)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Unable to access the image URI: ${e.message}")
+                    Toast.makeText(this, "Cannot access the image URI", Toast.LENGTH_SHORT).show()
                 }
-                val compressedFile = compressImage(file)
-                sendImageToNewStoryActivity(Uri.fromFile(compressedFile), token)
             }
         }
 
@@ -49,23 +55,29 @@ class CameraActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         token = intent.getStringExtra(EXTRA_TOKEN)
+        Log.d(TAG, "Token received: $token")
 
         if (hasPermissions()) {
+            Log.d(TAG, "All permissions granted.")
             initializeFeatures()
         } else {
+            Log.d(TAG, "Requesting permissions.")
             requestPermissions()
         }
 
         binding.ivCameraSwitch.setOnClickListener {
             isBackCamera = !isBackCamera
+            Log.d(TAG, "Camera switched. isBackCamera: $isBackCamera")
             startCamera()
         }
 
         binding.cbvCapture.setOnClickListener {
+            Log.d(TAG, "Capture button clicked.")
             captureImage()
         }
 
         binding.ivGalleryButton.setOnClickListener {
+            Log.d(TAG, "Gallery button clicked.")
             selectImageLauncher.launch("image/*")
         }
     }
@@ -88,6 +100,7 @@ class CameraActivity : AppCompatActivity() {
             ) == PackageManager.PERMISSION_GRANTED
         }
 
+        Log.d(TAG, "Camera permission: $cameraPermission, Gallery permission: $galleryPermission")
         return cameraPermission && galleryPermission
     }
 
@@ -98,6 +111,7 @@ class CameraActivity : AppCompatActivity() {
         } else {
             permissions.add(Manifest.permission.READ_EXTERNAL_STORAGE)
         }
+        Log.d(TAG, "Requesting permissions: $permissions")
         ActivityCompat.requestPermissions(this, permissions.toTypedArray(), 101)
     }
 
@@ -107,30 +121,36 @@ class CameraActivity : AppCompatActivity() {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        Log.d(TAG, "Permissions result for requestCode: $requestCode")
         if (requestCode == 101 && grantResults.isNotEmpty() &&
             grantResults.all { it == PackageManager.PERMISSION_GRANTED }
         ) {
+            Log.d(TAG, "All permissions granted after request.")
             initializeFeatures()
         } else {
+            Log.d(TAG, "Permission denied.")
             Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun initializeFeatures() {
+        Log.d(TAG, "Initializing features.")
         startCamera()
         loadGalleryImage()
     }
 
     private fun startCamera() {
+        Log.d(TAG, "Starting camera.")
         val cameraProviderFeature = ProcessCameraProvider.getInstance(this)
 
         cameraProviderFeature.addListener({
             try {
-                val cameraProvider = cameraProviderFeature.get()
-                cameraProvider.unbindAll()
+                cameraProvider = cameraProviderFeature.get()
+                cameraProvider?.unbindAll()
 
-                val preview = Preview.Builder().build()
-                preview.surfaceProvider = binding.pvCamera.surfaceProvider
+                val preview = Preview.Builder().build().also {
+                    it.surfaceProvider = binding.pvCamera.surfaceProvider
+                }
 
                 imageCapture = ImageCapture.Builder().build()
 
@@ -141,19 +161,22 @@ class CameraActivity : AppCompatActivity() {
                     )
                     .build()
 
-                camera = cameraProvider.bindToLifecycle(
+                camera = cameraProvider?.bindToLifecycle(
                     this,
                     cameraSelector,
                     preview,
                     imageCapture
                 )
+                Log.d(TAG, "Camera started successfully.")
             } catch (e: Exception) {
+                Log.e(TAG, "Camera start failed: ", e)
                 Toast.makeText(this, "Camera Failed", Toast.LENGTH_SHORT).show()
             }
         }, ContextCompat.getMainExecutor(this))
     }
 
     private fun captureImage() {
+        Log.d(TAG, "Capturing image.")
         val outputDir = cacheDir
         val outputFile = File.createTempFile("captured_image", ".jpg", outputDir)
 
@@ -163,39 +186,49 @@ class CameraActivity : AppCompatActivity() {
             ContextCompat.getMainExecutor(this),
             object : ImageCapture.OnImageSavedCallback {
                 override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
+                    Log.d(TAG, "Image captured: ${outputFile.absolutePath}")
                     val compressedFile = compressImage(outputFile)
                     val savedUri = Uri.fromFile(compressedFile)
+                    Log.d(TAG, "Compressed image URI: $savedUri")
                     sendImageToNewStoryActivity(savedUri, token)
                 }
 
                 override fun onError(exception: ImageCaptureException) {
-                    Toast.makeText(this@CameraActivity, "Failed to capture image", Toast.LENGTH_SHORT).show()
+                    Log.e(TAG, "Image capture failed: ", exception)
+                    Toast.makeText(
+                        this@CameraActivity,
+                        "Failed to capture image",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         )
     }
 
     private fun loadGalleryImage() {
+        Log.d(TAG, "Loading gallery image.")
         val uri: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         val projection = arrayOf(MediaStore.Images.Media._ID, MediaStore.Images.Media.DATE_ADDED)
         val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
 
         val cursor = contentResolver.query(uri, projection, null, null, sortOrder)
 
-        if (cursor != null && cursor.moveToFirst()) {
-            val columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
-            val imageId = cursor.getLong(columnIndex)
-            val imageUri = Uri.withAppendedPath(uri, imageId.toString())
+        cursor?.use {
+            if (it.moveToFirst()) {
+                val columnIndex = it.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
+                val imageId = it.getLong(columnIndex)
+                val imageUri = Uri.withAppendedPath(uri, imageId.toString())
+                Log.d(TAG, "Latest gallery image URI: $imageUri")
 
-            Glide.with(this)
-                .load(imageUri)
-                .into(binding.ivGalleryButton)
-
-            cursor.close()
-        }
+                Glide.with(this)
+                    .load(imageUri)
+                    .into(binding.ivGalleryButton)
+            }
+        } ?: Log.e(TAG, "Cursor is null or empty.")
     }
 
     private fun compressImage(file: File): File {
+        Log.d(TAG, "Compressing image: ${file.absolutePath}")
         val bitmap = BitmapFactory.decodeFile(file.path)
         var quality = 100
         val outputStream = ByteArrayOutputStream()
@@ -208,10 +241,12 @@ class CameraActivity : AppCompatActivity() {
         file.outputStream().use {
             it.write(outputStream.toByteArray())
         }
+        Log.d(TAG, "Image compressed: ${file.absolutePath}")
         return file
     }
 
     private fun sendImageToNewStoryActivity(imageUri: Uri, token: String?) {
+        Log.d(TAG, "Sending image to NewStoryActivity. URI: $imageUri, Token: $token")
         val intent = Intent(this, NewStoryActivity::class.java).apply {
             putExtra("image_uri", imageUri.toString())
             putExtra(EXTRA_TOKEN, token)
@@ -220,7 +255,14 @@ class CameraActivity : AppCompatActivity() {
         finish()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d(TAG, "onDestroy called. Releasing camera resources.")
+        cameraProvider?.unbindAll()
+    }
+
     companion object {
+        private const val TAG = "CameraActivity"
         const val EXTRA_TOKEN = "EXTRA_TOKEN"
     }
 }
