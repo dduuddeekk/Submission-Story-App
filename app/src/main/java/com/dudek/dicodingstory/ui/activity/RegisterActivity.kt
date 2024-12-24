@@ -26,6 +26,12 @@ class RegisterActivity : AppCompatActivity() {
 
         observeViewModel()
 
+        binding.goToLogIn.setOnClickListener {
+            val intent = Intent(this, LogInActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+
         binding.btRegister.setOnClickListener {
             validateAndRegister()
         }

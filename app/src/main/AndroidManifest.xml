@@ -54,10 +54,6 @@
             android:name=".data.service.TokenBackgroundService"
             android:enabled="true"
             android:exported="true" />
-
-        <activity
-            android:name=".ui.activity.AccountActivity"
-            android:exported="false" />
         <activity
             android:name=".ui.activity.StoryDetailActivity"
             android:exported="false" />

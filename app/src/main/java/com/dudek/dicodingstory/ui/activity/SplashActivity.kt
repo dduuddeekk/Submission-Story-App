@@ -31,7 +31,7 @@ class SplashActivity : AppCompatActivity() {
                 Handler(Looper.getMainLooper()).postDelayed({
                     if (token.isNullOrEmpty()) {
                         stopService(Intent(this@SplashActivity, TokenBackgroundService::class.java))
-                        navigateToAccountActivity()
+                        navigateToLogInActivity()
                     } else {
                         TokenBackgroundService.startService(this@SplashActivity)
                         navigateToMainActivity(token)
@@ -41,8 +41,8 @@ class SplashActivity : AppCompatActivity() {
         }
     }
 
-    private fun navigateToAccountActivity() {
-        val intent = Intent(this, AccountActivity::class.java)
+    private fun navigateToLogInActivity() {
+        val intent = Intent(this, LogInActivity::class.java)
         startActivity(intent)
         finish()
     }

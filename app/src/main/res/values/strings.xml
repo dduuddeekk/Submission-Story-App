@@ -35,4 +35,6 @@
     <string name="include_location">Include Location</string>
     <string name="retry">Try Again</string>
     <string name="user_name">User Name</string>
+    <string name="register_sign">Doesn\'t have an account? Let\'s register.</string>
+    <string name="log_in_sign">Already have an account? Let\'s log in.</string>
 </resources>

@@ -37,6 +37,12 @@ class LogInActivity : AppCompatActivity() {
             binding.passwordInput.setPassword(password)
         }
 
+        binding.goToRegister.setOnClickListener {
+            val intent = Intent(this, RegisterActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+
         binding.btLogIn.setOnClickListener {
             val email = binding.emailInput.getEmail()
             val password = binding.passwordInput.getPassword()
